@@ -1,0 +1,12 @@
+{
+  "test": "torch_npu_fp16_matmul",
+  "hardware": "Atlas 200I DK A2 / Ascend310B4",
+  "torch": "2.3.1",
+  "torch_npu": "2.3.1",
+  "jit_compile": false,
+  "available": true,
+  "device": "Ascend310B4",
+  "ok": true,
+  "seconds": 0.9314203740032099,
+  "value": 64.0
+}

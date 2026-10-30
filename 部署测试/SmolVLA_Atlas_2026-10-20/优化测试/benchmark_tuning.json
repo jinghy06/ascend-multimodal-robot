@@ -1,0 +1,165 @@
+{
+  "phase": "tuning",
+  "cases": [
+    {
+      "name": "baseline_10",
+      "steps": 10,
+      "seconds": [
+        23.309156353003345,
+        4.177459828999417,
+        4.1782498079992365
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "camera_count": 3,
+      "resize_hw": [
+        512,
+        512
+      ],
+      "relative_l2_vs_baseline": 0.0,
+      "max_absolute_vs_baseline": 0.0,
+      "warm_median_seconds": 4.177854818499327
+    },
+    {
+      "name": "3cam_384px_10step",
+      "steps": 10,
+      "seconds": [
+        2.8502977050011395,
+        2.820357017997594,
+        2.831812684999022
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "camera_count": 3,
+      "resize_hw": [
+        384,
+        384
+      ],
+      "relative_l2_vs_baseline": 0.537527014098598,
+      "max_absolute_vs_baseline": 0.5499541759490967,
+      "warm_median_seconds": 2.826084851498308
+    },
+    {
+      "name": "3cam_256px_10step",
+      "steps": 10,
+      "seconds": [
+        1.9170797069964465,
+        1.84752726899751,
+        1.912021101998107
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "camera_count": 3,
+      "resize_hw": [
+        256,
+        256
+      ],
+      "relative_l2_vs_baseline": 1.3593654939770157,
+      "max_absolute_vs_baseline": 1.5050658881664276,
+      "warm_median_seconds": 1.8797741854978085
+    },
+    {
+      "name": "3cam_256px_5step",
+      "steps": 5,
+      "seconds": [
+        1.3212537279978278,
+        1.3229818320032791,
+        1.3061917070008349
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "camera_count": 3,
+      "resize_hw": [
+        256,
+        256
+      ],
+      "relative_l2_vs_baseline": 1.2560777336510105,
+      "max_absolute_vs_baseline": 1.3395490646362305,
+      "warm_median_seconds": 1.314586769502057
+    },
+    {
+      "name": "2cam_256px_5step",
+      "steps": 5,
+      "seconds": [
+        1.11742216499988,
+        1.104444290001993,
+        1.0946242280042497
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "camera_count": 2,
+      "resize_hw": [
+        256,
+        256
+      ],
+      "relative_l2_vs_baseline": 0.6948957864480858,
+      "max_absolute_vs_baseline": 0.7341537475585938,
+      "warm_median_seconds": 1.0995342590031214
+    },
+    {
+      "name": "1cam_256px_5step",
+      "steps": 5,
+      "seconds": [
+        0.9174526029964909,
+        0.9352662290039007,
+        0.8949311870019301
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "camera_count": 1,
+      "resize_hw": [
+        256,
+        256
+      ],
+      "relative_l2_vs_baseline": 1.1736281937025896,
+      "max_absolute_vs_baseline": 1.148082658648491,
+      "warm_median_seconds": 0.9150987080029154
+    },
+    {
+      "name": "1cam_256px_3step",
+      "steps": 3,
+      "seconds": [
+        0.6837049789974117,
+        0.6812528740047128,
+        0.6796847910009092
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "camera_count": 1,
+      "resize_hw": [
+        256,
+        256
+      ],
+      "relative_l2_vs_baseline": 1.1018513791793227,
+      "max_absolute_vs_baseline": 1.11773681640625,
+      "warm_median_seconds": 0.680468832502811
+    }
+  ],
+  "scope": "synthetic 3 camera images; no physical action",
+  "clock": "synchronized complete predict_action_chunk including CPU preprocessing",
+  "fixed_noise_seed": 42,
+  "observations_recomputed_every_call": true,
+  "peak_process_rss_mib": 2277.33203125,
+  "ok": true
+}

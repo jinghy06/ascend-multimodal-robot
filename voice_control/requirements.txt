@@ -1,0 +1,12 @@
+numpy>=1.24
+pyyaml>=6.0
+# 语音链路（含 KWS 唤醒 / 流式 ASR / VAD / 可选 TTS）
+sherpa-onnx>=1.11
+# 麦克风采集（Linux 需系统包 libportaudio2；Windows 直接可用）
+sounddevice>=0.4.6
+
+# ---- 以下为可选项（LLM 路径才需要），版本要求见 README ----
+# transformers>=4.37          # Qwen2.5；Qwen3 需要 >=4.51
+# huggingface_hub>=0.23       # tools/download_models.py 下载 Qwen 用
+# torch / torch-npu           # 按平台安装，见 README「LLM 环境」
+# pypinyin                    # tools/make_keywords.py 生成/更换唤醒词用

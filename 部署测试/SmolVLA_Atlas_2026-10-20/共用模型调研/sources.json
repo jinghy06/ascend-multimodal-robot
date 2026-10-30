@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-20",
+  "sources": [
+    {
+      "name": "ChatVLA paper",
+      "url": "https://aclanthology.org/2025.emnlp-main.273.pdf",
+      "evidence": "shared attention, separate MLP experts, VQA and robot evaluation"
+    },
+    {
+      "name": "ChatVLA code",
+      "url": "https://github.com/tutujingyugang1/ChatVLA_public",
+      "evidence": "robot/VQA evaluation paths and checkpoint link"
+    },
+    {
+      "name": "StaticMoE implementation",
+      "url": "https://raw.githubusercontent.com/tutujingyugang1/ChatVLA_public/main/qwen2_vla/utils/expert_modules.py",
+      "evidence": "eval_in_vqa selects between two experts"
+    },
+    {
+      "name": "ChatVLA checkpoint",
+      "url": "https://huggingface.co/zzymeow/ChatVLA",
+      "evidence": "whole checkpoint labeled 3B BF16"
+    },
+    {
+      "name": "DiVLA paper",
+      "url": "https://arxiv.org/html/2412.03293v3",
+      "evidence": "section8.6 and table11 VQA examples"
+    },
+    {
+      "name": "DiVLA project",
+      "url": "https://diffusion-vla.github.io/",
+      "evidence": "2B minimum and A6000 measurements; links DexVLA for training code"
+    },
+    {
+      "name": "ChatVLA-2",
+      "url": "https://chatvla-2.github.io/",
+      "evidence": "math matching and spatial reasoning/action examples"
+    },
+    {
+      "name": "LLaVA-VLA",
+      "url": "https://github.com/OpenHelix-Team/LLaVA-VLA",
+      "evidence": "0.5B action-model variant; no verified Chinese dialogue retention in reviewed material"
+    }
+  ]
+}

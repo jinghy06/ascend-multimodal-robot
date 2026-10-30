@@ -1,0 +1,38 @@
+{
+  "checkpoint": "lerobot/smolvla_base",
+  "revision": "5e8d12a6e2975b0e5e5fce7c8caf47c371d257b6",
+  "device": "npu",
+  "input": "deterministic synthetic images and zero NORMALIZED joint state; no physical action",
+  "output_units": "normalized action space; not calibrated joint commands",
+  "camera_count": 3,
+  "image_preprocess_hw": [
+    512,
+    512
+  ],
+  "denoising_steps": 10,
+  "chunk_size": 50,
+  "action_dim": 6,
+  "timings_seconds": [],
+  "compatibility_patches": [
+    "GELU decomposed into equivalent scalar formula on NPU",
+    "Linear decomposed into matmul plus bias to avoid unavailable Addmm binary",
+    "small bucketize index calculation on CPU",
+    "float64 sinusoidal positions use float32 on NPU"
+  ],
+  "torch": "2.3.1",
+  "missing_keys": [],
+  "unexpected_keys": [],
+  "unloaded_parameters": [],
+  "parameter_count": 450046176,
+  "cpu_image_preprocessing": true,
+  "image_keys": [
+    "observation.images.camera1",
+    "observation.images.camera2",
+    "observation.images.camera3"
+  ],
+  "ok": false,
+  "error": "RuntimeError('The Inner error is reported as above. The process exits for this inner error, and the current working operator name is aclnnSWhere.\\nSince the operator is called asynchronously, the stacktrace may be inaccurate. If you want to get the accurate stacktrace, pleace set the environment variable ASCEND_LAUNCH_BLOCKING=1.\\n[ERROR] 2026-10-20-15:03:45 (PID:12811, Device:0, RankID:-1) ERR00100 PTA call acl api failed')",
+  "traceback": "Traceback (most recent call last):\n  File \"/root/smolvla-test-20261020/run_smolvla.py\", line 98, in <module>\n    with torch.inference_mode(), (torch.autocast(device_type='npu',dtype=torch.float16) if args.device=='npu' else contextlib.nullcontext()):action=policy.predict_action_chunk(batch,noise=noise)\n  File \"/root/smolvla-test-20261020/venv/lib/python3.10/site-packages/torch/utils/_contextlib.py\", line 115, in decorate_context\n    return func(*args, **kwargs)\n  File \"/root/smolvla-test-20261020/venv/lib/python3.10/site-packages/lerobot/policies/smolvla/modeling_smolvla.py\", line 422, in predict_action_chunk\n    actions = self._get_action_chunk(batch, noise)\n  File \"/root/smolvla-test-20261020/venv/lib/python3.10/site-packages/lerobot/policies/smolvla/modeling_smolvla.py\", line 394, in _get_action_chunk\n    actions = self.model.sample_actions(images, img_masks, lang_tokens, lang_masks, state, noise=noise)\n  File \"/root/smolvla-test-20261020/venv/lib/python3.10/site-packages/lerobot/policies/smolvla/modeling_smolvla.py\", line 882, in sample_actions\n    _, past_key_values = self.vlm_with_expert.forward(\n  File \"/root/smolvla-test-20261020/venv/lib/python3.10/site-packages/lerobot/policies/smolvla/smolvlm_with_expert.py\", line 478, in forward\n    out_emb = layer.mlp(out_emb)\n  File \"/root/smolvla-test-20261020/venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1532, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/root/smolvla-test-20261020/venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1541, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/root/smolvla-test-20261020/venv/lib/python3.10/site-packages/transformers/models/llama/modeling_llama.py\", line 172, in forward\n    down_proj = self.down_proj(self.act_fn(self.gate_proj(x)) * self.up_proj(x))\n  File \"/root/smolvla-test-20261020/venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1532, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/root/smolvla-test-20261020/venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1541, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/root/smolvla-test-20261020/venv/lib/python3.10/site-packages/torch/nn/modules/linear.py\", line 116, in forward\n    return F.linear(input, self.weight, self.bias)\n  File \"/root/smolvla-test-20261020/run_smolvla.py\", line 37, in unfused_linear\n    y=torch.matmul(x,weight.transpose(-1,-2))\nRuntimeError: The Inner error is reported as above. The process exits for this inner error, and the current working operator name is aclnnSWhere.\nSince the operator is called asynchronously, the stacktrace may be inaccurate. If you want to get the accurate stacktrace, pleace set the environment variable ASCEND_LAUNCH_BLOCKING=1.\n[ERROR] 2026-10-20-15:03:45 (PID:12811, Device:0, RankID:-1) ERR00100 PTA call acl api failed\n",
+  "total_seconds": 103.72189600500133,
+  "peak_rss_mib": 2292.453125
+}

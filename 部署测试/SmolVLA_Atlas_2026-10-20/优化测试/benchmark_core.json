@@ -1,0 +1,174 @@
+{
+  "phase": "core",
+  "cases": [
+    {
+      "name": "baseline_10",
+      "steps": 10,
+      "seconds": [
+        22.281523270001344,
+        4.271567433002929,
+        4.184365704000811
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "relative_l2_vs_baseline": 0.0,
+      "max_absolute_vs_baseline": 0.0,
+      "warm_median_seconds": 4.22796656850187
+    },
+    {
+      "name": "static_loop_10",
+      "steps": 10,
+      "seconds": [
+        4.181604432997119,
+        4.1706007049942855,
+        4.165268828997796
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "relative_l2_vs_baseline": 0.0,
+      "max_absolute_vs_baseline": 0.0,
+      "warm_median_seconds": 4.167934766996041
+    },
+    {
+      "name": "static_loop_5",
+      "steps": 5,
+      "seconds": [
+        3.500915267999517,
+        3.496161455004767,
+        3.4974524970020866
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "relative_l2_vs_baseline": 0.07287883182366005,
+      "max_absolute_vs_baseline": 0.08612060546875,
+      "warm_median_seconds": 3.496806976003427
+    },
+    {
+      "name": "static_loop_3",
+      "steps": 3,
+      "seconds": [
+        3.2272931639963645,
+        3.2260459339959198,
+        3.226118516999122
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "relative_l2_vs_baseline": 0.1559110834302941,
+      "max_absolute_vs_baseline": 0.18450927734375,
+      "warm_median_seconds": 3.226082225497521
+    },
+    {
+      "name": "static_loop_2",
+      "steps": 2,
+      "seconds": [
+        3.0934308510040864,
+        3.091293183999369,
+        3.092328268001438
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "relative_l2_vs_baseline": 0.2548578176118816,
+      "max_absolute_vs_baseline": 0.3055000305175781,
+      "warm_median_seconds": 3.0918107260004035
+    },
+    {
+      "name": "static_loop_1",
+      "steps": 1,
+      "seconds": [
+        2.95741328800068,
+        3.0596676639979705,
+        2.9604262680004467
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "relative_l2_vs_baseline": 0.5643667728044618,
+      "max_absolute_vs_baseline": 0.6592936515808105,
+      "warm_median_seconds": 3.0100469659992086
+    }
+  ],
+  "scope": "synthetic 3 camera images; no physical action",
+  "clock": "synchronized complete predict_action_chunk including CPU preprocessing",
+  "fixed_noise_seed": 42,
+  "observations_recomputed_every_call": true,
+  "peak_process_rss_mib": 2243.125,
+  "profile": {
+    "total_with_stage_synchronization": 4.197028829003102,
+    "note": "Nested times overlap; synchronization instrumentation changes timing.",
+    "stages": {
+      "image_preprocess": {
+        "count": 1,
+        "sum_seconds": 0.03138379099982558,
+        "seconds": [
+          0.03138379099982558
+        ]
+      },
+      "vision_encoder": {
+        "count": 3,
+        "sum_seconds": 2.3732171450028545,
+        "seconds": [
+          0.7907547080030781,
+          0.7911421039971174,
+          0.791320333002659
+        ]
+      },
+      "prefix_embedding_including_vision": {
+        "count": 1,
+        "sum_seconds": 2.377596435995656,
+        "seconds": [
+          2.377596435995656
+        ]
+      },
+      "suffix_embedding": {
+        "count": 10,
+        "sum_seconds": 0.033766501015634276,
+        "seconds": [
+          0.003575624999939464,
+          0.0033162500039907172,
+          0.003278249998402316,
+          0.0033383330010110512,
+          0.003388438002730254,
+          0.0032265629997709766,
+          0.003326062003907282,
+          0.003576041999622248,
+          0.003466688001935836,
+          0.0032742500043241307
+        ]
+      },
+      "denoise_step_including_expert": {
+        "count": 10,
+        "sum_seconds": 1.3670084349942044,
+        "seconds": [
+          0.13722743700054707,
+          0.13623918799567036,
+          0.13630722899688408,
+          0.1364279159970465,
+          0.1367391250023502,
+          0.13659324999753153,
+          0.13648039499821607,
+          0.13747772900387645,
+          0.13726797900017118,
+          0.136248187001911
+        ]
+      }
+    }
+  },
+  "ok": true
+}

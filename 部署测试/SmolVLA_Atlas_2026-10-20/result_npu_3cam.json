@@ -1,0 +1,57 @@
+{
+  "checkpoint": "lerobot/smolvla_base",
+  "revision": "5e8d12a6e2975b0e5e5fce7c8caf47c371d257b6",
+  "device": "npu",
+  "input": "deterministic synthetic images and zero NORMALIZED joint state; no physical action",
+  "output_units": "normalized action space; not calibrated joint commands",
+  "camera_count": 3,
+  "image_preprocess_hw": [
+    512,
+    512
+  ],
+  "denoising_steps": 10,
+  "chunk_size": 50,
+  "action_dim": 6,
+  "timings_seconds": [
+    24.42618399800267,
+    4.187501558000804
+  ],
+  "compatibility_patches": [
+    "GELU decomposed into equivalent scalar formula on NPU",
+    "SiLU decomposed into x times sigmoid(x) on NPU",
+    "Linear decomposed into matmul plus bias to avoid unavailable Addmm binary",
+    "finite FP32 scalar attention masking uses boolean arithmetic instead of SelectV2; other where calls use CPU",
+    "small bucketize index calculation on CPU",
+    "small sinusoidal time embedding computed on CPU then cast to float32 and transferred to NPU"
+  ],
+  "torch": "2.3.1",
+  "missing_keys": [],
+  "unexpected_keys": [],
+  "unloaded_parameters": [],
+  "parameter_count": 450046176,
+  "cpu_image_preprocessing": true,
+  "image_keys": [
+    "observation.images.camera1",
+    "observation.images.camera2",
+    "observation.images.camera3"
+  ],
+  "output_shape": [
+    1,
+    50,
+    6
+  ],
+  "output_finite": true,
+  "output_first_action": [
+    -0.1413143128156662,
+    -0.0013871192932128906,
+    -0.1091194748878479,
+    -0.005902111530303955,
+    0.03513932228088379,
+    -0.2700762152671814
+  ],
+  "output_min": -0.7095533609390259,
+  "output_max": 0.4927586317062378,
+  "peak_rss_mib": 2275.5546875,
+  "ok": true,
+  "total_seconds": 102.04832936100502
+}

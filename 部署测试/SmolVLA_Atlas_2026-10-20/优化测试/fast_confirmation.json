@@ -1,0 +1,34 @@
+{
+  "scope": "synthetic inputs; normalized state/actions; no hardware control",
+  "cameras": 1,
+  "resolution": 256,
+  "steps": 3,
+  "chunk_shape": [
+    1,
+    50,
+    6
+  ],
+  "operating_point_changed": true,
+  "cross_observation_cache": false,
+  "seconds": [
+    17.940236502996413,
+    0.7139462280028965,
+    0.6776687279998441,
+    0.7031646659961552,
+    0.6800500409954111,
+    0.6798459569981787
+  ],
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46,
+    47
+  ],
+  "all_finite": true,
+  "warm_median_seconds": 0.6800500409954111,
+  "warm_min_seconds": 0.6776687279998441,
+  "warm_max_seconds": 0.7139462280028965,
+  "ok": true
+}

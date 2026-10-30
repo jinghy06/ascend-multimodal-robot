@@ -1,0 +1,12 @@
+# 模型与虚拟环境不入库
+models/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+# 自录数据集与评测报告
+dataset/
+*_report.json

@@ -1,0 +1,47 @@
+{
+  "checkpoint": "lerobot/smolvla_base",
+  "revision": "5e8d12a6e2975b0e5e5fce7c8caf47c371d257b6",
+  "device": "cpu",
+  "input": "deterministic synthetic images and zero NORMALIZED joint state; no physical action",
+  "output_units": "normalized action space; not calibrated joint commands",
+  "camera_count": 3,
+  "image_preprocess_hw": [
+    512,
+    512
+  ],
+  "denoising_steps": 10,
+  "chunk_size": 50,
+  "action_dim": 6,
+  "timings_seconds": [
+    66.1798961659988
+  ],
+  "torch": "2.3.1",
+  "missing_keys": [],
+  "unexpected_keys": [],
+  "unloaded_parameters": [],
+  "parameter_count": 450046176,
+  "image_keys": [
+    "observation.images.camera1",
+    "observation.images.camera2",
+    "observation.images.camera3"
+  ],
+  "output_shape": [
+    1,
+    50,
+    6
+  ],
+  "output_finite": true,
+  "output_first_action": [
+    -0.08839917182922363,
+    -0.029842667281627655,
+    -0.07928270846605301,
+    0.049782589077949524,
+    0.06490218639373779,
+    -0.5812249779701233
+  ],
+  "output_min": -1.0550674200057983,
+  "output_max": 0.6712894439697266,
+  "peak_rss_mib": 2994.4609375,
+  "ok": true,
+  "total_seconds": 101.24650732000009
+}

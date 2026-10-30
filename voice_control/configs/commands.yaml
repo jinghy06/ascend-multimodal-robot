@@ -1,0 +1,134 @@
+# 指令目录 —— 默认版本（W5 接口评审与队友冻结后以此为准更新）
+# params 的值一律为英文编码（code），surface 保留用户原词用于回复渲染
+
+slots:
+  color:
+    红: red
+    红色: red
+    蓝: blue
+    蓝色: blue
+    绿: green
+    绿色: green
+    黄: yellow
+    黄色: yellow
+    黑: black
+    黑色: black
+    白: white
+    白色: white
+    紫: purple
+    紫色: purple
+  object:
+    杯子: cup
+    纸杯: cup
+    瓶子: bottle
+    海绵: sponge
+    海绵块: sponge
+    盒子: box
+    小盒子: box
+    积木: block
+    玩偶: doll
+  location:
+    桌子: table
+    茶几: teatable
+    门口: door
+    厨房: kitchen
+    客厅: livingroom
+    卧室: bedroom
+    充电区: dock
+    出发点: home
+  distance:
+    近: near
+    近一点: near
+    远: far
+    远一点: far
+
+commands:
+  - id: follow_start
+    templates: ["跟着我", "跟我走", "开始跟随", "跟随我"]
+    params: []
+    reply: "好的，开始跟随。"
+  - id: follow_stop
+    templates: ["停止跟随", "别跟了", "不要跟着了"]
+    params: []
+    reply: "好的，停止跟随。"
+  - id: follow_adjust
+    templates: ["跟{distance}一点", "跟得{distance}一点", "{distance}一点跟着"]
+    params: [distance]
+    reply: "好的，跟随距离已调整。"
+  - id: nav_to
+    templates: ["去{location}", "到{location}去", "前往{location}", "开去{location}", "开到{location}", "开到{location}去", "到{location}", "移动到{location}"]
+    params: [location]
+    reply: "好的，前往{location}。"
+  - id: nav_cancel
+    templates: ["取消导航", "别去了", "停下来别走"]
+    params: []
+    reply: "好的，已取消导航。"
+  - id: go_home
+    templates: ["回来", "回出发点", "回家", "返回起点", "回到出发点"]
+    params: []
+    reply: "好的，返回出发点。"
+  - id: grasp
+    templates:
+      - "抓起{color}{object}"
+      - "抓{color}{object}"
+      - "拿起{color}{object}"
+      - "把{color}{object}拿起来"
+      - "把{color}{object}抓起来"
+      - "抓取{color}{object}"
+    params: [color, object]
+    reply: "好的，去抓{color}{object}。"
+  - id: place
+    templates: ["放下", "松手", "放开", "把东西放下"]
+    params: []
+    reply: "好的，放下。"
+  - id: grasp_retry
+    templates: ["再抓一次", "重新抓", "再试一次"]
+    params: []
+    reply: "好的，再抓一次。"
+  - id: arm_reset
+    templates: ["手臂归位", "机械臂复位", "手臂复位"]
+    params: []
+    reply: "好的，机械臂归位。"
+  - id: arm_fold
+    templates: ["收起手臂", "收臂", "折叠手臂"]
+    params: []
+    reply: "好的，收起机械臂。"
+  - id: laser_start
+    templates: ["激光笔模式", "开始激光笔指引", "打开指引模式", "指引模式"]
+    params: []
+    reply: "好的，激光笔指引模式已开启。"
+  - id: laser_stop
+    templates: ["关闭指引模式", "退出激光笔模式", "关闭激光笔"]
+    params: []
+    reply: "好的，已退出指引模式。"
+  - id: pause
+    templates: ["暂停", "暂停任务"]
+    params: []
+    reply: "好的，已暂停。"
+  - id: resume
+    templates: ["继续", "继续任务"]
+    params: []
+    reply: "好的，继续执行。"
+  - id: stop_all
+    templates: ["停止", "停下", "停", "全部停止"]
+    params: []
+    reply: "好的，全部停止。"
+  - id: report_status
+    templates: ["报告状态", "你现在在干什么", "当前状态"]
+    params: []
+    reply: "正在汇报当前状态。"
+  - id: query_battery
+    templates: ["还剩多少电", "电量多少", "报告电量"]
+    params: []
+    reply: "正在查询电量。"
+  - id: where_am_i
+    templates: ["我在哪", "这是哪里", "你在哪"]
+    params: []
+    reply: "正在查询当前位置。"
+  - id: who_are_you
+    templates: ["你是谁", "自我介绍"]
+    params: []
+    reply: "我是机器车语音助手，可以执行跟随、导航和抓取任务。"
+
+# 兜底话术（LLM 解析失败 / 规则未命中且 LLM 不可用时）
+fallback_reply: "没听懂，请再说一次。"

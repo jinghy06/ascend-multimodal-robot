@@ -1,0 +1,24 @@
+{
+  "description": "开放词汇改写评测语料（示例，随采集扩充到 ≥50 条）。params 值为 commands.yaml 中的英文编码。",
+  "samples": [
+    {"text": "帮我把那个红色的杯子拿过来", "task_id": "grasp", "params": {"color": "red", "object": "cup"}},
+    {"text": "把红杯子给我抓起来", "task_id": "grasp", "params": {"color": "red", "object": "cup"}},
+    {"text": "我想让你去厨房", "task_id": "nav_to", "params": {"location": "kitchen"}},
+    {"text": "开到桌子那边去", "task_id": "nav_to", "params": {"location": "table"}},
+    {"text": "过来跟着我走", "task_id": "follow_start", "params": {}},
+    {"text": "别跟着我了", "task_id": "follow_stop", "params": {}},
+    {"text": "离我再近一点跟着", "task_id": "follow_adjust", "params": {"distance": "near"}},
+    {"text": "回到最开始的地方", "task_id": "go_home", "params": {}},
+    {"text": "把瓶子放下吧", "task_id": "place", "params": {}},
+    {"text": "刚才没抓住，再试一回", "task_id": "grasp_retry", "params": {}},
+    {"text": "先停一下别动", "task_id": "pause", "params": {}},
+    {"text": "接着刚才的任务继续", "task_id": "resume", "params": {}},
+    {"text": "全部停下", "task_id": "stop_all", "params": {}},
+    {"text": "看看现在还有多少电", "task_id": "query_battery", "params": {}},
+    {"text": "手臂回到初始位置", "task_id": "arm_reset", "params": {}},
+    {"text": "把机械臂收起来", "task_id": "arm_fold", "params": {}},
+    {"text": "打开激光笔引导", "task_id": "laser_start", "params": {}},
+    {"text": "退出指引", "task_id": "laser_stop", "params": {}},
+    {"text": "今天天气怎么样", "task_id": "unknown", "params": {}}
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "comparison": "CPU FP32 versus NPU FP16 with compatibility patches; same seed42 noise and synthetic inputs",
+  "max_absolute_error": 0.0028679370880126953,
+  "mean_absolute_error": 0.0005558904384573301,
+  "relative_l2_error": 0.0014910558975326962,
+  "cosine_similarity": 0.9999989373770599,
+  "cpu_shape": [
+    1,
+    50,
+    6
+  ],
+  "npu_shape": [
+    1,
+    50,
+    6
+  ],
+  "cpu_finite": true,
+  "npu_finite": true,
+  "cpu_first_action": [
+    -0.08839917182922363,
+    -0.029842667281627655,
+    -0.07928270846605301,
+    0.049782589077949524,
+    0.06490218639373779,
+    -0.5812249779701233
+  ],
+  "npu_first_action": [
+    -0.08835694193840027,
+    -0.03015744686126709,
+    -0.07965743541717529,
+    0.04981762170791626,
+    0.06458985805511475,
+    -0.5815755128860474
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "phase": "batch",
+  "cases": [
+    {
+      "name": "baseline_10",
+      "steps": 10,
+      "seconds": [
+        22.67854291600088,
+        4.159615370997926,
+        4.162181476000114
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "camera_count": 3,
+      "resize_hw": [
+        512,
+        512
+      ],
+      "relative_l2_vs_baseline": 0.0,
+      "max_absolute_vs_baseline": 0.0,
+      "warm_median_seconds": 4.16089842349902
+    },
+    {
+      "name": "batched_vision_static_10",
+      "steps": 10,
+      "seconds": [
+        8.942815950002114,
+        4.19195999600197,
+        4.187063058001513
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "camera_count": 3,
+      "resize_hw": [
+        512,
+        512
+      ],
+      "relative_l2_vs_baseline": 0.0,
+      "max_absolute_vs_baseline": 0.0,
+      "warm_median_seconds": 4.189511527001741
+    },
+    {
+      "name": "batched_vision_static_3",
+      "steps": 3,
+      "seconds": [
+        3.256490143001429,
+        3.25311124700238,
+        3.255799039005069
+      ],
+      "runs_finite": [
+        true,
+        true,
+        true
+      ],
+      "camera_count": 3,
+      "resize_hw": [
+        512,
+        512
+      ],
+      "relative_l2_vs_baseline": 0.1559110834302941,
+      "max_absolute_vs_baseline": 0.18450927734375,
+      "warm_median_seconds": 3.2544551430037245
+    }
+  ],
+  "scope": "synthetic 3 camera images; no physical action",
+  "clock": "synchronized complete predict_action_chunk including CPU preprocessing",
+  "fixed_noise_seed": 42,
+  "observations_recomputed_every_call": true,
+  "peak_process_rss_mib": 2237.02734375,
+  "ok": true
+}

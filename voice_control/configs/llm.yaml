@@ -1,0 +1,18 @@
+# LLM 配置 —— 模型路径配置化，切换模型只改这里
+# 注意：Qwen3 系列要求 transformers >= 4.51；Qwen2.5 要求 >= 4.37
+
+# Qwen2.5-0.5B-Instruct（默认保底，版本要求低）
+model_path: models/Qwen2.5-0.5B-Instruct
+
+# Qwen3-0.6B 评测候选（定型后替换上方 model_path 并启用下两行）：
+# model_path: models/Qwen3-0.6B
+# enable_thinking: false
+
+device: auto            # auto: 有 NPU 用 NPU，其次 CUDA，最后 CPU
+dtype: auto             # auto: NPU→bfloat16，CUDA→float16，CPU→float32
+temperature: 0.7
+top_p: 0.8
+top_k: 20
+max_parse_tokens: 64    # 解析调用（只输出短 JSON，越小路由越快）
+max_reply_tokens: 64    # 回复调用
+request_timeout_sec: 5  # parser_node 等待 llm_service 的超时
