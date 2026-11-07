@@ -1,0 +1,323 @@
+[
+  {
+    "profile": "lean256",
+    "flags": [
+      "-c",
+      "256",
+      "-b",
+      "128",
+      "-ub",
+      "64",
+      "--cache-ram",
+      "0",
+      "--ctx-checkpoints",
+      "0"
+    ],
+    "ready": {
+      "working_set_mib": 807.4375,
+      "peak_working_set_mib": 807.4375,
+      "private_commit_mib": 491.88671875
+    },
+    "after": {
+      "working_set_mib": 820.328125,
+      "peak_working_set_mib": 855.17578125,
+      "private_commit_mib": 499.5703125
+    },
+    "seconds_median": 0.33333570000104373,
+    "from_qwen": 18,
+    "rows": [
+      {
+        "event": "follow_started",
+        "text": "好，你走吧，我跟着。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.3192589999998745
+      },
+      {
+        "event": "follow_target_lost_stopped",
+        "text": "没跟上你，我先停在这儿了。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.3579795000005106
+      },
+      {
+        "event": "grasp_failed_not_held_stopped",
+        "text": "没拿到，刚才夹爪没夹住。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.3466074000025401
+      },
+      {
+        "event": "grasp_confirmed_held",
+        "text": "拿到了，夹稳了。",
+        "variant": "A",
+        "source": "qwen",
+        "seconds": 0.3275976000004448
+      },
+      {
+        "event": "two_red_blocks_left_right",
+        "text": "左边和右边各有一块红方块，你说的是哪个？",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.4266480000005686
+      },
+      {
+        "event": "speech_unclear",
+        "text": "刚那句没听清，再说一遍就好。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.35716790000151377
+      },
+      {
+        "event": "follow_started",
+        "text": "跟上你了，我在后面。",
+        "variant": "B",
+        "source": "qwen",
+        "seconds": 0.2425595999993675
+      },
+      {
+        "event": "follow_target_lost_stopped",
+        "text": "没跟上你，我先停在这儿了。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.2640766000004078
+      },
+      {
+        "event": "grasp_failed_not_held_stopped",
+        "text": "没拿到，刚才夹爪没夹住。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.2827537000011944
+      },
+      {
+        "event": "grasp_confirmed_held",
+        "text": "拿起来了，东西在夹爪里。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.259166699997877
+      },
+      {
+        "event": "two_red_blocks_left_right",
+        "text": "左边和右边各有一块红方块，你说的是哪个？",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.31876679999913904
+      },
+      {
+        "event": "speech_unclear",
+        "text": "刚那句没听清，再说一遍就好。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.2760097999998834
+      },
+      {
+        "event": "follow_started",
+        "text": "好，我跟上了。你往前走就行。",
+        "variant": "A",
+        "source": "qwen",
+        "seconds": 0.31204259999867645
+      },
+      {
+        "event": "follow_target_lost_stopped",
+        "text": "没跟上你，我先停在这儿了。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.33907380000164267
+      },
+      {
+        "event": "grasp_failed_not_held_stopped",
+        "text": "没拿到，刚才夹爪没夹住。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.34317709999959334
+      },
+      {
+        "event": "grasp_confirmed_held",
+        "text": "拿起来了，东西在夹爪里。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.3435943000004045
+      },
+      {
+        "event": "two_red_blocks_left_right",
+        "text": "左边和右边各有一块红方块，你说的是哪个？",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.37119959999836283
+      },
+      {
+        "event": "speech_unclear",
+        "text": "刚那句没听清，再说一遍就好。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.39157949999935227
+      }
+    ],
+    "adversarial": {
+      "text": "还没拿到，刚才没夹稳。",
+      "variant": "A",
+      "source": "qwen"
+    }
+  },
+  {
+    "profile": "lean256_no_repack",
+    "flags": [
+      "-c",
+      "256",
+      "-b",
+      "128",
+      "-ub",
+      "64",
+      "--cache-ram",
+      "0",
+      "--ctx-checkpoints",
+      "0",
+      "--no-repack"
+    ],
+    "ready": {
+      "working_set_mib": 648.28125,
+      "peak_working_set_mib": 648.28125,
+      "private_commit_mib": 332.96484375
+    },
+    "after": {
+      "working_set_mib": 662.6015625,
+      "peak_working_set_mib": 697.390625,
+      "private_commit_mib": 342.9296875
+    },
+    "seconds_median": 0.3388985000001412,
+    "from_qwen": 18,
+    "rows": [
+      {
+        "event": "follow_started",
+        "text": "好，我跟上了。你往前走就行。",
+        "variant": "A",
+        "source": "qwen",
+        "seconds": 0.2868463000013435
+      },
+      {
+        "event": "follow_target_lost_stopped",
+        "text": "没跟上你，我先停在这儿了。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.354453600000852
+      },
+      {
+        "event": "grasp_failed_not_held_stopped",
+        "text": "没拿到，刚才夹爪没夹住。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.3281910000005155
+      },
+      {
+        "event": "grasp_confirmed_held",
+        "text": "拿到了，夹稳了。",
+        "variant": "A",
+        "source": "qwen",
+        "seconds": 0.3514375000013388
+      },
+      {
+        "event": "two_red_blocks_left_right",
+        "text": "左边和右边各有一块红方块，你说的是哪个？",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.3907504999988305
+      },
+      {
+        "event": "speech_unclear",
+        "text": "刚才没听清，你再说一遍？",
+        "variant": "A",
+        "source": "qwen",
+        "seconds": 0.41729729999860865
+      },
+      {
+        "event": "follow_started",
+        "text": "好，你走吧，我跟着。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.27787890000035986
+      },
+      {
+        "event": "follow_target_lost_stopped",
+        "text": "没跟上你，我先停在这儿了。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.26416590000008
+      },
+      {
+        "event": "grasp_failed_not_held_stopped",
+        "text": "没拿到，刚才夹爪没夹住。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.2909225000003062
+      },
+      {
+        "event": "grasp_confirmed_held",
+        "text": "拿起来了，东西在夹爪里。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.28212400000120397
+      },
+      {
+        "event": "two_red_blocks_left_right",
+        "text": "左边和右边各有一块红方块，你说的是哪个？",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.32594610000160174
+      },
+      {
+        "event": "speech_unclear",
+        "text": "刚那句没听清，再说一遍就好。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.33491570000114734
+      },
+      {
+        "event": "follow_started",
+        "text": "好，我跟上了。你往前走就行。",
+        "variant": "A",
+        "source": "qwen",
+        "seconds": 0.3098606999992626
+      },
+      {
+        "event": "follow_target_lost_stopped",
+        "text": "没跟上你，我先停在这儿了。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.3489000000008673
+      },
+      {
+        "event": "grasp_failed_not_held_stopped",
+        "text": "没拿到，刚才夹爪没夹住。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.3428812999991351
+      },
+      {
+        "event": "grasp_confirmed_held",
+        "text": "拿到了，夹稳了。",
+        "variant": "A",
+        "source": "qwen",
+        "seconds": 0.3544311000005109
+      },
+      {
+        "event": "two_red_blocks_left_right",
+        "text": "左边和右边各有一块红方块，你说的是哪个？",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.414684399998805
+      },
+      {
+        "event": "speech_unclear",
+        "text": "刚那句没听清，再说一遍就好。",
+        "variant": "C",
+        "source": "qwen",
+        "seconds": 0.3861490000017511
+      }
+    ],
+    "adversarial": {
+      "text": "还没拿到，刚才没夹稳。",
+      "variant": "A",
+      "source": "qwen"
+    }
+  }
+]
