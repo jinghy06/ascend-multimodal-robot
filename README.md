@@ -9,6 +9,7 @@
 | 目录 / 文件 | 内容 |
 |---|---|
 | [voice_control](voice_control/README.md) | KWS、流式 ASR、规则与 LLM 指令解析、ROS 2 节点、测试与模型下载工具 |
+| [esp32_voice_terminal](esp32_voice_terminal/README.md) | ESP32-S3、INMP441、MAX98357A 与 ST7735S 的语音终端开发版及接线 |
 | [开题报告](开题报告/) | 蓝白配色 PPT、逐页讲稿（DOCX / Markdown） |
 | [项目计划书](项目计划书.md) | 原始总体方案，另含独显与核显开发版本 |
 | [VLA 常驻部署计划](VLA常驻与多功能低延迟部署计划.md) | 模型常驻、语音分工与 ROS 内存验证计划 |
