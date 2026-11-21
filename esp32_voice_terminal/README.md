@@ -4,9 +4,12 @@
 
 ## 当前边界
 
-已实现源代码：Wi-Fi SoftAP、INMP441 采集、MAX98357A 播放队列、ST7735S 状态页、串口目标地址设置，以及电脑端 WAV/UDP 工具。
+已实现源代码：Wi-Fi SoftAP、INMP441 采集与 80 Hz 高通滤波、MAX98357A 播放队列、ST7735S 三态表情、离线测试网页、本地 3 秒 WAV 录音、电脑与扬声器回放、串口目标地址设置，以及电脑端 WAV/UDP 工具。网页可通过 ESP32 原生 USB 串口直接启动、停止 Atlas 手柄控制，并返回真实进程状态。
 
-验证状态：`esp32:esp32 4.0.0` 下编译通过；电脑端 UDP/WAV 录音与播放回环测试通过。实际外设、烧录和整机语音链路尚待硬件测试。
+表情状态：待机时青色眨眼；滤波后 20 ms 帧 RMS 超过阈值时显示绿色 `LISTENING`；本地测试音、录音回放或 UDP 播放时显示黄色 `SPEAKING` 和嘴巴动画。详细包计数与 RMS 仍由网页和串口提供。屏幕使用 160×128 离屏画布后整帧推送，避免直接清屏重绘造成闪烁；音频连续输出，不做逐采样硬归零，语音保持时间为 600 ms。
+
+验证状态：`esp32:esp32 4.0.0` 下编译通过；电脑端 UDP/WAV 录音与播放回环测试通过；用户已通过离线网页确认真实麦克风与功放测试正常。ESP32 直连 Atlas 的 `/atlas/start` 实测返回 `ok:true`、`status:started`、PID 2283，随后 `/atlas/stop` 返回 `status:stopped`，进程正常结束。三态表情及最新滤波的主观听感仍以用户现场反馈为准。
+
 
 尚未完成：Opus、回声消除、Atlas ASR/TTS 对接、USB ECM/RNDIS 网桥、电机状态或视频转发。不要把当前版本描述为已完成整机语音或无线网卡。默认热点密码仅用于实验室，正式部署应修改且不要开放到互联网。
 
@@ -76,6 +79,24 @@ arduino-cli upload -p COM12 \
 ```
 
 Linux 下将 `COM12` 换成实际串口。上传期间不要同时打开串口监视器。
+
+## 最简单的离线网页测试
+
+无需电脑端工具或互联网：连接热点 `ATLAS_VOICE`，浏览器打开 `http://192.168.4.1`。页面每 500 ms 刷新 INMP441 峰值与 RMS，并提供 MAX98357A 的 1 秒、440 Hz 本地测试音。“录制 3 秒并回放”将滤波后的音频直接保存在 ESP32 内存中，再以标准 WAV 在浏览器回放，不经过 UDP。“让扬声器播放最近录音”则从同一内存缓冲区逐帧送往 MAX98357A，播放期间显示 `SPEAKING`。切换热点会暂时断开其他网络，测试后切回原来的 Wi-Fi 即可。
+
+## Atlas 手柄遥控网页启动
+
+推荐使用 `atlas_serial_control.py` 进行 ESP32 与 Atlas 的 USB 直连，不依赖电脑或网卡。将 `atlas_serial_control.py`、`atlas_control_server.py` 与手柄脚本放在同一目录，运行：
+
+```bash
+nohup /root/smolvla-test-20261020/venv/bin/python atlas_serial_control.py > serial_control.log 2>&1 </dev/null &
+```
+
+ESP32 的原生 USB 从电脑移到 Atlas USB 主机口后，默认识别为 `/dev/ttyACM1`。网页请求 ESP32 的 `/atlas/start` 或 `/atlas/stop`，ESP32 再通过 USB JSON 调用 Atlas。只有 Atlas 启动进程并通过 2 秒存活检查才返回 `ok:true`、`status:started` 和 PID；已在运行时返回 `already_running`，超时或异常会返回真实错误。USB 断开时 Atlas 服务会停止手柄进程。
+
+备用 HTTP 服务仍为 `atlas_control_server.py`，健康检查为 `GET /api/health`。它只适合电脑同时通过 Wi-Fi 连接 ESP32、通过 USB 网络连接 Atlas 的调试拓扑，不是当前默认直连路径。服务仅用于实验室局域网，不应暴露到互联网。
+
+USB ECM/RNDIS、视频和电机状态转发仍未实现；USB 串口直连只承担启停命令与状态。
 
 ## Wi-Fi 音频测试
 
