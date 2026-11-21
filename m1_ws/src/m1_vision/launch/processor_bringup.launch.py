@@ -26,7 +26,7 @@ def generate_launch_description():
         DeclareLaunchArgument("voice_root", default_value="/root/ascend-multimodal-robot/voice_control"),
         DeclareLaunchArgument("use_mock", default_value="false"),
         DeclareLaunchArgument("enable_asr", default_value="true"),
-        DeclareLaunchArgument("enable_tts", default_value="true"),
+        DeclareLaunchArgument("enable_tts", default_value="false"),
         DeclareLaunchArgument("enable_semantic", default_value="false"),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(m1_share, "launch", "m1_mock.launch.py")),

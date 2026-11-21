@@ -18,7 +18,7 @@ if [[ "$MODE" == "mock" ]]; then
 elif [[ "$MODE" == "hardware" ]]; then
   exec ros2 launch m1_vision processor_bringup.launch.py \
     use_mock:=false enable_asr:="${ENABLE_ASR:-true}" \
-    enable_tts:="${ENABLE_TTS:-true}" enable_semantic:="${ENABLE_SEMANTIC:-false}" \
+    enable_tts:="${ENABLE_TTS:-false}" enable_semantic:="${ENABLE_SEMANTIC:-false}" \
     voice_root:="$PROJECT_DIR/voice_control"
 else
   echo "usage: $0 [hardware|mock]" >&2

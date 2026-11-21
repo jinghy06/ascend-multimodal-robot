@@ -57,8 +57,11 @@ m1_ws/
 ## 构建（板上）
 
 ```bash
+cd /root/ascend-multimodal-robot
+git submodule update --init --recursive
 source /root/resident-integration-20261021/ros/setup.bash
-cd /root/ascend-multimodal-robot/m1_ws
+cd m1_ws
+if test ! -e src/voice_control; then ln -s ../../voice_control src/voice_control; fi
 colcon build --symlink-install \
   --packages-select m1_msgs vision_msgs m1_vision voice_control \
   --cmake-args -DBUILD_TESTING=OFF
@@ -78,8 +81,10 @@ ros2 launch m1_vision processor_bringup.launch.py use_mock:=true enable_asr:=fal
 scripts/run_processor.sh hardware                             # M1+M2 实机统一入口
 ```
 
-`processor_bringup.launch.py` 默认启用麦克风 ASR 与 TTS，开放语义服务默认关闭。
-无音频设备时设 `enable_asr:=false`；TTS 默认只保存 WAV，不假装完成声卡播放。
+`processor_bringup.launch.py` 默认启用麦克风 ASR，开放语义服务默认关闭。无音频设备时设
+`enable_asr:=false`。队长当前语音包没有 `tts_node`，因此 TTS 默认关闭；只有语音包提供
+`tts_node` 与 `configs/tts.yaml` 时才设置 `enable_tts:=true`，不能把 WAV 生成当作声卡播放。
+物体检测默认 `target_fps:=5.0`，为人体姿态跟随预留 NPU 算力；该调度值仍需在实机复测。
 
 无硬件仿真会补充 `map → base_link → laser_frame` 静态 TF，可检查 `/m1/follow_target`、
 `/m1/grasp_target` 和 `/m1/laser_goal`。仿真通过不代表真实相机、雷达、导航或机械臂验收通过。
