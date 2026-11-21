@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>m1_vision</name>
+  <version>0.1.0</version>
+  <description>M1 视觉感知模块：YOLO NPU 推理 + 激光笔光斑识别 + 雷达融合测距 + 目标跟踪（Atlas 200I DK A2）</description>
+  <maintainer email="you@example.com">M1 Owner</maintainer>
+  <license>MIT</license>
+
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>vision_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>m1_msgs</depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

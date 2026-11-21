@@ -1,0 +1,19 @@
+[Unit]
+Description=Ascend multimodal robot processor stack
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/ascend-multimodal-robot
+ExecStart=/root/ascend-multimodal-robot/m1_ws/scripts/run_processor.sh hardware
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGINT
+TimeoutStopSec=20
+Environment=ENABLE_ASR=true
+Environment=ENABLE_TTS=true
+Environment=ENABLE_SEMANTIC=false
+
+[Install]
+WantedBy=multi-user.target
