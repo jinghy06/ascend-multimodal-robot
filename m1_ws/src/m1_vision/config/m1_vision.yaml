@@ -1,0 +1,83 @@
+# M1 视觉感知模块参数（Atlas 200I DK A2）
+# 与设计文档第 4/5 章对应；标注「W?」的为对应周次需要实测整定的量。
+
+camera_driver_node:
+  ros__parameters:
+    device: "/dev/video0"
+    video_file: ""            # 调试：填视频路径则循环播放（无相机调试用）
+    width: 1920
+    height: 1080
+    fps: 30.0
+    frame_id: "camera_link"
+    camera_info_yaml: ""      # W2 标定后填标定文件路径
+    fx: 1200.0                # 标定前的近似内参
+    fy: 1200.0
+    object_image_topic: "/camera/image_object"  # 独立低频流，避免物体节点接收每帧大图
+    object_publish_fps: 2.0
+
+yolo_npu_node:
+  ros__parameters:
+    om_model_path: "/root/models/yolov8n-pose_640.om"
+    onnx_model_path: ""       # CPU 兜底（NPU 链路故障时填 onnx 路径）
+    input_size: 640           # 与 ATC 转换档位一致（INT8/动态 shape 不可兼得，固定档）
+    conf_threshold: 0.5       # 设计文档 5.1
+    nms_threshold: 0.45
+    max_det: 10
+    device_id: 0
+    fps_report_frames: 100
+
+object_detection_node:
+  ros__parameters:
+    om_model_path: "/root/models/yolov8n_640.om"
+    onnx_model_path: ""
+    image_topic: "/camera/image_object"
+    input_size: 640
+    conf_threshold: 0.4
+    nms_threshold: 0.45
+    max_det: 20
+    device_id: 0
+    target_fps: 2.0           # 抓取检测低频运行，给人体姿态跟随保留 NPU 算力
+    fps_report_frames: 10
+
+laser_spot_node:
+  ros__parameters:
+    laser_color: "red"        # red / green
+    red_h_low1: 0
+    red_h_high1: 10
+    red_h_low2: 170
+    red_h_high2: 180
+    green_h_low: 35
+    green_h_high: 90
+    sat_min: 120              # W3 实测不同光照整定
+    val_min: 150
+    area_min: 5.0
+    area_max: 2000.0
+    circularity_min: 0.6      # 设计文档 5.3：4πA/P² > 0.6
+    morph_kernel: 3
+    publish_debug_image: true
+
+fusion_ranging_node:
+  ros__parameters:
+    laser_frame: "laser_frame"
+    window_deg: 5.0           # 设计文档 5.2：θ±5° 窗口
+    cluster_gap: 0.15         # W4 实测整定
+    min_cluster_points: 3
+    fallback_hfov_deg: 78.0
+    fallback_mount_yaw_deg: 0.0
+    image_width_fallback: 1920
+
+target_tracking_node:
+  ros__parameters:
+    publish_rate: 20.0        # 与 M4 约定 20 Hz
+    lock_hits: 3              # 设计文档 5.5：连续命中 ≥3 帧锁定
+    lost_misses: 10           # 连续丢失 ≥10 帧判 LOST
+    gate_chi2: 9.21           # 马氏距离门限（2 自由度 99%）
+    lost_reset_timeout: 5.0   # LOST 超过该秒数后清空轨迹，下次检测视为新目标
+    laser_frame: "laser_frame"
+    base_frame: "base_link"
+    map_frame: "map"
+    spot_stable_window: 2.0
+    spot_stable_radius: 0.15
+    spot_min_points: 5
+    goal_safety_offset: 0.3   # 设计文档 5.4：向外安全偏移 0.3 m
+    goal_cooldown: 3.0

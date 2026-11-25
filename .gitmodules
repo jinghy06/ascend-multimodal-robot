@@ -1,0 +1,3 @@
+[submodule "m1_ws/src/vision_msgs"]
+	path = m1_ws/src/vision_msgs
+	url = https://github.com/ros-perception/vision_msgs.git
