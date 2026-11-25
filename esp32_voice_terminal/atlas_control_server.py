@@ -31,7 +31,7 @@ class GamepadManager:
             raise RuntimeError(f"Control script missing: {self.script}")
         self.log_handle = self.log_path.open("ab", buffering=0)
         self.process = subprocess.Popen(
-            [sys.executable, "-u", str(self.script), "--input-backend", "usb", "--arm-step", "2.0"],
+            [sys.executable, "-u", str(self.script), "--input-backend", "usb", "--arm-step", "2.0", "--rate", "10"],
             cwd=self.directory,
             stdin=subprocess.DEVNULL,
             stdout=self.log_handle,

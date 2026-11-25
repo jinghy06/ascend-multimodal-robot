@@ -15,7 +15,12 @@ constexpr size_t PCM_BYTES = FRAME_SAMPLES * sizeof(int16_t);
 constexpr size_t RAW_WORDS = FRAME_SAMPLES * 2;
 constexpr uint16_t MIC_PORT = 5004;
 constexpr uint16_t SPEAKER_PORT = 5006;
-constexpr size_t PLAY_QUEUE_DEPTH = 6;
+constexpr size_t PLAY_QUEUE_DEPTH = 12;
+constexpr uint8_t USB_AUDIO_MAGIC0 = 0xAA;
+constexpr uint8_t USB_AUDIO_MAGIC1 = 0x55;
+constexpr uint8_t USB_FRAME_MIC = 0x01;
+constexpr uint8_t USB_FRAME_SPK = 0x02;
+constexpr uint32_t ECHO_MUTE_HOLD_MS = 320;
 constexpr size_t RECORD_SAMPLES = SAMPLE_RATE * 3;
 constexpr size_t RECORD_BYTES = RECORD_SAMPLES * sizeof(int16_t);
 
@@ -38,6 +43,7 @@ const char INDEX_HTML[] PROGMEM = R"HTML(
 <h1>语音终端离线测试</h1><section><h2>INMP441 麦克风</h2><p>对麦克风说话，观察能量变化。</p><div id="bar"><div id="level"></div></div><p>峰值：<b id="peak">0</b>　RMS：<b id="rms">0</b></p><button id="recordBtn" onclick="startRecording()">录制 3 秒并回放</button> <b id="recmsg"></b><audio id="playback" controls></audio><br><br><button onclick="playOnSpeaker()">让扬声器播放最近录音</button></section>
 <section><h2>MAX98357A 功放</h2><p>点击后应播放约 1 秒、440 Hz 测试音。</p><button onclick="fetch('/tone').then(()=>document.getElementById('msg').textContent='正在播放')">播放测试音</button><p id="msg"></p></section>
 <section><h2>Atlas 手柄遥控</h2><p>ESP32 需通过 USB 直接连接 Atlas，网页可用来手机或电脑访问。成功后显示 Atlas 返回的状态与 PID。</p><button onclick="atlasControl('start')">启动手柄遥控</button> <button style="background:#ef4444" onclick="atlasControl('stop')">停止遥控</button><p id="atlasmsg"></p></section>
+<section><h2>SmolVLA 示教录制</h2><p>Atlas 已开机自启录制守护服务，插上 ESP32 后可直接点“示教开始”（会自动拉起手柄控制）。双路 640×480@10fps 保存为 LeRobot episode。</p><p>任务指令：<input id="taskInput" value="pick up the orange" style="width:100%;box-sizing:border-box;font-size:16px;padding:8px;margin-top:6px;border-radius:6px;border:1px solid #4b5563;background:#111827;color:#f9fafb"></p><button id="demoStartBtn" onclick="demoControl('start')">示教开始</button> <button id="demoStopBtn" style="background:#ef4444" onclick="demoControl('stop')">示教结束</button> <button style="background:#3b82f6" onclick="refreshDemoStatus()">刷新状态</button><p id="demomsg">点击“刷新状态”查看 Atlas 录制状态</p></section>
 <p>状态：麦克风 <span id="m">0</span> 包；扬声器 <span id="s">0</span> 包；欠载 <span id="u">0</span></p>
 <script>
 function refresh(){fetch('/status').then(r=>r.json()).then(s=>{
@@ -79,6 +85,39 @@ async function atlasControl(action){
       :'失败：'+(result.error||'HTTP '+response.status);
   }catch(error){message.textContent='连接 Atlas 失败：'+error.message;}
 }
+function formatDemoStatus(result){
+  const saved=(result.saved_episodes!==undefined)?'，已存条数：'+result.saved_episodes:'';
+  const frames=(result.frames!==undefined)?'，帧数：'+result.frames:'';
+  const root=result.root?'，目录：'+result.root:'';
+  return '状态：'+result.status+frames+saved+root;
+}
+async function refreshDemoStatus(){
+  const message=document.getElementById('demomsg');
+  try{
+    const response=await fetch('/demo/status');
+    const result=await response.json();
+    message.textContent=response.ok&&result.ok
+      ?formatDemoStatus(result)
+      :'查询失败：'+(result.error||'HTTP '+response.status);
+  }catch(error){message.textContent='查询示教状态失败：'+error.message;}
+}
+async function demoControl(action){
+  const message=document.getElementById('demomsg');
+  const startBtn=document.getElementById('demoStartBtn');
+  const stopBtn=document.getElementById('demoStopBtn');
+  startBtn.disabled=true; stopBtn.disabled=true;
+  message.textContent=action==='start'?'正在启动示教（约 2~5 秒）...':'正在编码保存 AV1 视频，请勿断电（长视频需十几秒）...';
+  try{
+    const task=encodeURIComponent((document.getElementById('taskInput').value||'').trim());
+    const url=action==='start'&&task?'/demo/start?task='+task:'/demo/'+action;
+    const response=await fetch(url,{method:'POST'});
+    const result=await response.json();
+    message.textContent=response.ok&&result.ok
+      ?formatDemoStatus(result)
+      :'失败：'+(result.error||'HTTP '+response.status);
+  }catch(error){message.textContent='示教服务连接失败：'+error.message;}
+  finally{startBtn.disabled=false; stopBtn.disabled=false;}
+}
 setInterval(refresh,500);refresh();
 </script>
 </html>)HTML";
@@ -90,6 +129,11 @@ WiFiUDP micUdp;
 WiFiUDP speakerUdp;
 WebServer server(80);
 QueueHandle_t playQueue = nullptr;
+SemaphoreHandle_t serialWriteMutex = nullptr;
+volatile bool usbAudioEnabled = false;
+volatile bool atlasCmdPending = false;
+String atlasCmdResponse = "";
+volatile bool atlasCmdGotResponse = false;
 IPAddress targetIp(192, 168, 4, 2);
 volatile uint32_t micPackets = 0;
 volatile uint32_t speakerPackets = 0;
@@ -107,27 +151,163 @@ volatile bool recordingDone = false;
 volatile bool replayActive = false;
 size_t replayIndex = 0;
 
-String callAtlas(const char* command) {
-  while (Serial.available()) Serial.read();
-  Serial.printf("{\"cmd\":\"%s\"}\n", command);
+String sanitizeJsonText(const String& raw) {
+  String out;
+  out.reserve(raw.length());
+  for (size_t i = 0; i < raw.length() && out.length() < 120; ++i) {
+    char c = raw[i];
+    if (c == '"' || c == '\\' || c == '\r' || c == '\n') continue;
+    out += c;
+  }
+  out.trim();
+  return out;
+}
+
+void sendUsbMicFrame(const int16_t* pcm, size_t bytes) {
+  if (!usbAudioEnabled || serialWriteMutex == nullptr) return;
+  if (xSemaphoreTake(serialWriteMutex, 0) != pdTRUE) return;
+  if (Serial.availableForWrite() > 0) {
+    uint8_t header[6] = {
+      USB_AUDIO_MAGIC0,
+      USB_AUDIO_MAGIC1,
+      USB_FRAME_MIC,
+      0x00,
+      static_cast<uint8_t>(bytes & 0xFF),
+      static_cast<uint8_t>((bytes >> 8) & 0xFF),
+    };
+    Serial.write(header, sizeof(header));
+    Serial.write(reinterpret_cast<const uint8_t*>(pcm), bytes);
+  }
+  xSemaphoreGive(serialWriteMutex);
+}
+
+void pushSpeakerPcm(const int16_t* pcm) {
+  if (playQueue == nullptr) return;
+  if (xQueueSend(playQueue, pcm, 0) != pdTRUE) {
+    int16_t discarded[FRAME_SAMPLES];
+    xQueueReceive(playQueue, discarded, 0);
+    xQueueSend(playQueue, pcm, 0);
+  }
+  ++speakerPackets;
+  lastSpeakerActivity = millis();
+}
+
+void pollUsbSerial() {
+  static enum { S_IDLE, S_MAGIC1, S_TYPE, S_RES, S_LEN0, S_LEN1, S_PAYLOAD, S_JSON } state = S_IDLE;
+  static uint8_t frameType = 0;
+  static uint16_t payloadLen = 0;
+  static uint16_t payloadPos = 0;
+  static uint8_t payloadBuf[PCM_BYTES];
+  static String lineBuf;
+
+  while (Serial.available()) {
+    int raw = Serial.read();
+    if (raw < 0) break;
+    uint8_t b = static_cast<uint8_t>(raw);
+
+    if (state == S_IDLE) {
+      if (b == USB_AUDIO_MAGIC0) {
+        state = S_MAGIC1;
+      } else if (b == '{') {
+        lineBuf = "{";
+        state = S_JSON;
+      }
+      continue;
+    }
+
+    if (state == S_JSON) {
+      if (b == '\n') {
+        lineBuf.trim();
+        if (lineBuf.indexOf("\"cmd\":\"audio_on\"") >= 0) {
+          usbAudioEnabled = true;
+        } else if (lineBuf.indexOf("\"cmd\":\"audio_off\"") >= 0) {
+          usbAudioEnabled = false;
+        } else if (atlasCmdPending) {
+          atlasCmdResponse = lineBuf;
+          atlasCmdGotResponse = true;
+        }
+        lineBuf = "";
+        state = S_IDLE;
+      } else if (b != '\r' && lineBuf.length() < 512) {
+        lineBuf += static_cast<char>(b);
+      }
+      continue;
+    }
+
+    if (state == S_MAGIC1) {
+      state = (b == USB_AUDIO_MAGIC1) ? S_TYPE : S_IDLE;
+    } else if (state == S_TYPE) {
+      frameType = b;
+      state = S_RES;
+    } else if (state == S_RES) {
+      state = S_LEN0;
+    } else if (state == S_LEN0) {
+      payloadLen = b;
+      state = S_LEN1;
+    } else if (state == S_LEN1) {
+      payloadLen |= static_cast<uint16_t>(b) << 8;
+      payloadPos = 0;
+      if (frameType == USB_FRAME_SPK && payloadLen == PCM_BYTES) {
+        state = S_PAYLOAD;
+      } else {
+        state = S_IDLE;
+      }
+    } else if (state == S_PAYLOAD) {
+      payloadBuf[payloadPos++] = b;
+      if (payloadPos >= payloadLen) {
+        pushSpeakerPcm(reinterpret_cast<const int16_t*>(payloadBuf));
+        state = S_IDLE;
+      }
+    }
+  }
+}
+
+String callAtlas(const char* command, uint32_t timeoutMs = 20000, const String& task = "") {
+  String cleanTask = sanitizeJsonText(task);
+  atlasCmdGotResponse = false;
+  atlasCmdResponse = "";
+  atlasCmdPending = true;
+  if (serialWriteMutex != nullptr) xSemaphoreTake(serialWriteMutex, portMAX_DELAY);
+  if (cleanTask.length() > 0) {
+    Serial.printf("{\"cmd\":\"%s\",\"task\":\"%s\"}\n", command, cleanTask.c_str());
+  } else {
+    Serial.printf("{\"cmd\":\"%s\"}\n", command);
+  }
+  Serial.flush();
+  if (serialWriteMutex != nullptr) xSemaphoreGive(serialWriteMutex);
+
   uint32_t started = millis();
-  while (millis() - started < 8000) {
-    if (Serial.available()) {
-      String line = Serial.readStringUntil('\n');
-      line.trim();
-      if (line.startsWith("{")) return line;
+  while (millis() - started < timeoutMs) {
+    pollUsbSerial();
+    if (atlasCmdGotResponse) {
+      atlasCmdPending = false;
+      return atlasCmdResponse;
     }
     delay(1);
   }
+  atlasCmdPending = false;
   return "{\"ok\":false,\"error\":\"Atlas response timeout\"}";
 }
 
 void handleAtlasStart() {
-  server.send(200, "application/json", callAtlas("start"));
+  server.send(200, "application/json", callAtlas("start", 20000));
 }
 
 void handleAtlasStop() {
-  server.send(200, "application/json", callAtlas("stop"));
+  server.send(200, "application/json", callAtlas("stop", 20000));
+}
+
+void handleDemoStart() {
+  String task = server.hasArg("task") ? server.arg("task") : "";
+  server.send(200, "application/json", callAtlas("demo_start", 25000, task));
+}
+
+void handleDemoStop() {
+  server.send(200, "application/json", callAtlas("demo_stop", 120000));
+}
+
+void handleDemoStatus() {
+  server.send(200, "application/json", callAtlas("demo_status", 5000));
 }
 
 void handleWebStatus() {
@@ -293,6 +473,17 @@ void audioTask(void*) {
     micPeak = peak;
     micRms = frames > 0 ? static_cast<int>(sqrtf(sumSquares / frames)) : 0;
     if (frames == FRAME_SAMPLES) {
+      uint32_t nowMs = millis();
+      bool speakerBusy = toneFrames > 0 || replayActive ||
+                         (lastSpeakerActivity != 0 && nowMs - lastSpeakerActivity < ECHO_MUTE_HOLD_MS);
+      if (usbAudioEnabled) {
+        if (speakerBusy) {
+          static const int16_t silence[FRAME_SAMPLES] = {};
+          sendUsbMicFrame(silence, PCM_BYTES);
+        } else {
+          sendUsbMicFrame(micPcm, PCM_BYTES);
+        }
+      }
       micUdp.beginPacket(targetIp, MIC_PORT);
       micUdp.write(reinterpret_cast<const uint8_t*>(micPcm), PCM_BYTES);
       if (micUdp.endPacket() == 1) ++micPackets;
@@ -373,6 +564,8 @@ void handleSerial() {
 }  // namespace
 
 void setup() {
+  Serial.setTxBufferSize(4096);
+  Serial.setRxBufferSize(4096);
   Serial.begin(115200);
   pinMode(TFT_BL, OUTPUT);
   digitalWrite(TFT_BL, HIGH);
@@ -393,8 +586,12 @@ void setup() {
   server.on("/recording/play", HTTP_POST, handleReplayStart);
   server.on("/atlas/start", HTTP_POST, handleAtlasStart);
   server.on("/atlas/stop", HTTP_POST, handleAtlasStop);
+  server.on("/demo/start", HTTP_POST, handleDemoStart);
+  server.on("/demo/stop", HTTP_POST, handleDemoStop);
+  server.on("/demo/status", HTTP_GET, handleDemoStatus);
   server.begin();
   playQueue = xQueueCreate(PLAY_QUEUE_DEPTH, PCM_BYTES);
+  serialWriteMutex = xSemaphoreCreateMutex();
 
   I2S.setPins(I2S_BCLK, I2S_WS, AMP_DIN, MIC_SD);
   bool ok = I2S.begin(I2S_MODE_STD, SAMPLE_RATE, I2S_DATA_BIT_WIDTH_32BIT, I2S_SLOT_MODE_STEREO);
@@ -409,6 +606,7 @@ void setup() {
 }
 
 void loop() {
+  pollUsbSerial();
   server.handleClient();
   receiveSpeakerAudio();
   static uint32_t lastDisplay = 0;
