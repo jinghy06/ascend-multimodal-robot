@@ -345,8 +345,8 @@ class FollowController:
             self.mode = "idle"
             self.reset_motion()
             return None
-        if task_id in ("stop_all", "pause"):
-            if task_id == "stop_all":
+        if task_id in ("stop_all", "pause", "grasp", "place", "grasp_retry", "arm_reset", "arm_fold"):
+            if task_id != "pause":
                 self.last_active_mode = None
             self.mode = "idle"
             self.reset_motion()
@@ -622,12 +622,17 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     signal.signal(signal.SIGTERM, _handle_stop)
     signal.signal(signal.SIGINT, _handle_stop)
 
-    def _release_hw():
-        nonlocal capture
+    def _release_hw(release_npu: bool = True):
+        nonlocal capture, detector
         driver.stop_and_disconnect()
         if capture is not None:
             capture.release()
             capture = None
+        if release_npu and detector is not None:
+            t_rel = time.monotonic()
+            detector.close()
+            detector = None
+            print(f"[FOLLOW] NPU detector released in {(time.monotonic() - t_rel)*1000:.0f} ms", flush=True)
 
     def _ensure_hw(need_npu: bool) -> bool:
         nonlocal capture, detector

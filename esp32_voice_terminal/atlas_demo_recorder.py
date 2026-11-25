@@ -6,8 +6,12 @@ from pathlib import Path
 
 import cv2
 
-from lerobot.datasets.lerobot_dataset import LeRobotDataset
-from lerobot.datasets.utils import build_dataset_frame, hw_to_dataset_features
+
+def _load_lerobot_dataset_api():
+    from lerobot.datasets.lerobot_dataset import LeRobotDataset
+    from lerobot.datasets.utils import build_dataset_frame, hw_to_dataset_features
+
+    return LeRobotDataset, build_dataset_frame, hw_to_dataset_features
 
 
 def read_json(path, default):
@@ -93,7 +97,9 @@ class EpisodeRecorder:
         self.status_path = Path(status_path)
         self.fps = fps
         self.capture_names = capture_names
-        self.dataset_factory = dataset_factory or (lambda **kwargs: LeRobotDataset.create(**kwargs))
+        self.dataset_factory = dataset_factory or (
+            lambda **kwargs: _load_lerobot_dataset_api()[0].create(**kwargs)
+        )
         self.capture_factory = capture_factory or (lambda index: open_v4l2_camera(index, fps=self.fps))
         self.dataset = None
         self.captures = {}
@@ -136,6 +142,7 @@ class EpisodeRecorder:
         self.captures = {}
 
     def _start(self):
+        _, _, hw_to_dataset_features = _load_lerobot_dataset_api()
         self.episode_id = self.command["episode_id"]
         self.root = Path(self.command["root"])
         self.task = self.command["task"]
@@ -201,6 +208,7 @@ class EpisodeRecorder:
                 **action,
                 **self._read_images(),
             }
+            _, build_dataset_frame, _ = _load_lerobot_dataset_api()
             frame = build_dataset_frame(self.features, values, "observation")
             frame.update(build_dataset_frame(self.features, values, "action"))
             add_dataset_frame(self.dataset, frame, self.task, self.frames / self.fps)

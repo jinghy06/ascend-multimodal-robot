@@ -72,6 +72,10 @@ def test_voice_state_machine_transitions():
 
     ctrl.apply_voice_command({"task_id": "laser_start", "params": {}})
     assert ctrl.mode == "laser"
+    ctrl.apply_voice_command({"task_id": "grasp", "params": {"color": "red", "object": "cup"}})
+    assert ctrl.mode == "idle"
+    ctrl.apply_voice_command({"task_id": "follow_start", "params": {}})
+    assert ctrl.mode == "person"
     ctrl.apply_voice_command({"task_id": "stop_all", "params": {}})
     assert ctrl.mode == "idle"
     # After stop_all, resume should stay idle
