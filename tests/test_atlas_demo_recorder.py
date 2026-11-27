@@ -2,6 +2,7 @@ import json
 import time
 
 import numpy as np
+import pytest
 
 from atlas_demo_recorder import (
     DemoCommandManager,
@@ -30,12 +31,16 @@ class FakeDataset:
     def __init__(self):
         self.frames = []
         self.saved = False
+        self.cleared = False
 
     def add_frame(self, frame):
         self.frames.append(frame)
 
     def save_episode(self):
         self.saved = True
+
+    def clear_episode_buffer(self):
+        self.cleared = True
 
 
 class FakeCapture:
@@ -278,3 +283,121 @@ def test_open_v4l2_camera_applies_format_resolution_fps_and_buffer(monkeypatch):
         ("set", cv2.CAP_PROP_FPS, 10),
         ("set", cv2.CAP_PROP_BUFFERSIZE, 1),
     ]
+
+
+def _make_ep_dir(root, ep_id, total_episodes=1, total_frames=5):
+    meta = root / "demonstrations" / ep_id / "meta"
+    meta.mkdir(parents=True, exist_ok=True)
+    (meta / "info.json").write_text(
+        json.dumps({"total_episodes": total_episodes, "total_frames": total_frames}),
+        encoding="utf-8",
+    )
+
+
+def test_demo_status_reconciles_stale_recording_and_counts_only_valid_episodes(tmp_path):
+    _make_ep_dir(tmp_path, "20261124_000001", total_episodes=0, total_frames=0)
+    _make_ep_dir(tmp_path, "20261124_233607", total_episodes=1, total_frames=7)
+    (tmp_path / "demo_status.json").write_text(
+        json.dumps({"recording": True, "status": "recording", "episode_id": "20261124_233622", "frames": 0}),
+        encoding="utf-8",
+    )
+
+    class StoppedGamepad:
+        def status(self):
+            return {"running": False, "pid": None}
+
+    manager = DemoCommandManager(StoppedGamepad(), tmp_path)
+    st = manager.status()
+
+    assert st["recording"] is False
+    assert st["status"] == "idle"
+    assert st["saved_episodes"] == 1
+    assert st["last_episode_id"] == "20261124_233607"
+    assert json.loads((tmp_path / "demo_command.json").read_text())["active"] is False
+
+
+def test_episode_recorder_cancel_discards_without_saving(tmp_path):
+    command_path = tmp_path / "command.json"
+    status_path = tmp_path / "status.json"
+    episode_root = tmp_path / "demonstrations" / "ep_cancel"
+    episode_root.mkdir(parents=True)
+    dataset = FakeDataset()
+    write_command(command_path, True, episode_root, episode_id="ep_cancel")
+
+    recorder = EpisodeRecorder(
+        FakeRobot(),
+        command_path,
+        status_path,
+        dataset_factory=lambda **kwargs: dataset,
+        capture_factory=lambda index: FakeCapture(index),
+    )
+    recorder.record(ARM_OBSERVATION, dict(ARM_OBSERVATION))
+    assert recorder.recording is True
+
+    command_path.write_text(json.dumps({"active": False, "discard": True}), encoding="utf-8")
+    time.sleep(0.11)
+    recorder.record(ARM_OBSERVATION, dict(ARM_OBSERVATION))
+
+    status = json.loads(status_path.read_text(encoding="utf-8"))
+    assert recorder.recording is False
+    assert dataset.saved is False
+    assert dataset.cleared is True
+    assert status["status"] == "discarded"
+    assert episode_root.exists() is False
+
+
+def test_demo_manager_discard_last_deletes_newest_valid_episode(tmp_path):
+    _make_ep_dir(tmp_path, "20261124_100000", total_episodes=1, total_frames=10)
+    _make_ep_dir(tmp_path, "20261124_100500", total_episodes=1, total_frames=12)
+
+    class IdleGamepad:
+        def status(self):
+            return {"running": False}
+
+    manager = DemoCommandManager(IdleGamepad(), tmp_path)
+    res = manager.discard_last()
+
+    assert res["ok"] is True
+    assert res["discarded_episode_id"] == "20261124_100500"
+    assert res["saved_episodes"] == 1
+    assert (tmp_path / "demonstrations" / "20261124_100500").exists() is False
+    assert (tmp_path / "demonstrations" / "20261124_100000").exists() is True
+
+    manager.discard_last()
+    empty_res = manager.discard_last()
+    assert empty_res["ok"] is False
+    assert empty_res["status"] == "empty"
+
+
+def test_episode_recorder_decouples_high_rate_control_to_target_fps(tmp_path):
+    command_path = tmp_path / "command.json"
+    status_path = tmp_path / "status.json"
+    episode_root = tmp_path / "ep_decoupled"
+    dataset = FakeDataset()
+    write_command(command_path, False, episode_root, episode_id="ep_decoupled")
+
+    recorder = EpisodeRecorder(
+        FakeRobot(),
+        command_path,
+        status_path,
+        fps=10,
+        dataset_factory=lambda **kwargs: dataset,
+        capture_factory=lambda index: FakeCapture(index),
+    )
+
+    # Idle: should not request observation
+    assert recorder.wants_observation() is False
+
+    write_command(command_path, True, episode_root, episode_id="ep_decoupled")
+    recorder.last_command_check = 0.0
+    assert recorder.wants_observation() is True
+
+    # Simulate ~30 Hz control ticks over 0.23 s -> at 10 fps should record 3 frames (t=0.0, 0.1, 0.2)
+    for _ in range(8):
+        recorder.record(ARM_OBSERVATION, dict(ARM_OBSERVATION))
+        time.sleep(0.033)
+
+    assert 2 <= len(dataset.frames) <= 3
+    assert dataset.frames[0]["timestamp"] == pytest.approx(0.0)
+    assert dataset.frames[1]["timestamp"] == pytest.approx(0.1)
+    recorder.close()
