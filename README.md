@@ -9,7 +9,9 @@
 | 目录 / 文件 | 内容 |
 |---|---|
 | [voice_control](voice_control/README.md) | KWS、流式 ASR、规则与 LLM 指令解析、ROS 2 节点、测试与模型下载工具 |
-| [esp32_voice_terminal](esp32_voice_terminal/README.md) | ESP32-S3、INMP441、MAX98357A 与 ST7735S 的语音终端开发版及接线 |
+| [esp32_voice_terminal](esp32_voice_terminal/README.md) | Atlas 端串口复用、语音桥接、双摄数采录制与无雷达纯视觉跟随（`atlas_visual_follow.py`） |
+| [esp32_idf_voice_terminal](esp32_idf_voice_terminal/) | ESP-IDF 5.5 固件：本地中文流式 ESP-TTS、4 状态鲸鱼娘 UI、160×28 中文字幕叠加与 Web 控车页 |
+| [SmolVLA 数据采集与后训练指南](SmolVLA_LeKiwi_数据采集与后训练指南.md) | SO-101 + LeKiwi 双摄演示采集、校验与 SmolVLA 后训练流程 |
 | [m1_ws](m1_ws/README.md) | M1 视觉感知：YOLOv8n-pose 人体关键点、YOLOv8n 通用物体检测、激光笔识别、雷达融合、跟随目标与抓取接口（Atlas / ROS 2） |
 | [开题报告](开题报告/) | 蓝白配色 PPT、逐页讲稿（DOCX / Markdown） |
 | [项目计划书](项目计划书.md) | 原始总体方案，另含独显与核显开发版本 |
@@ -23,6 +25,8 @@
 ## 已有证据与边界
 
 - M1 视觉模块（m1_ws）已在 Atlas 200I DK A2 上实测：YOLOv8n-pose 纯推理 49.7 FPS（640×640 输入）；ROS 2 视频链路已输出人体 17 关键点、通用物体类别与激光光斑，融合测距、跟随目标和抓取接口以仿真数据验证。双模型未限流时端到端实测约 16.7 FPS（姿态）/15.6 FPS（物体），默认物体检测限为 5 Hz 后的组合性能仍需实机复测。真实相机、雷达、执行器与整机联调尚待验收。
+- 无激光雷达纯视觉跟随（`esp32_voice_terminal/atlas_visual_follow.py`）已实测：复用 M1 的 `yolov8n-pose_640.om`（NPU 端到端 30–33 FPS）与红点 HSV 检测，监听语音指令驱动 LeKiwi 底盘，空闲/抓取指令下 0 ms 释放 NPU 与串口/摄像头。
+- 3.5 GB 统一内存分时复用方案已在 Atlas 200I DK A2（四常驻服务全程在线、无桌面环境，待机可用内存约 2.8 GiB）上完成实测验证：SmolVLA（2 摄/256×256/5 步）常驻休眠至 CPU/Swap（`policy.to("cpu") + empty_cache`）后可用内存恢复至 `1015 MiB`，休眠期间独立进程加载运行 YOLO NPU 达 `32.4 FPS`（加载 `4.75 s`，释放 `0.0 ms`，0 冲突）；切回抓取时 SmolVLA 唤醒上 NPU 仅需 `1.71 s`（对比冷启 `113 s`），唤醒首帧 `5.78 s`，温态 `1.15 s`（`all_finite=true`，0 OOM）。
 - 已有 SmolVLA 在 Ascend 310B 上的推理及 CPU / NPU 数值对照。
 - 原工作配置暖机推理约 4.19 秒；单相机、低分辨率、减少迭代步数的快速配置约 0.68 秒，但动作输出差异明显，不能视为同质量替代或抓取成功证明。
 - 完整语言骨干恢复的本地测试和中文意图分类结果保存在测试目录；生成文本不等于可靠理解控制指令。
